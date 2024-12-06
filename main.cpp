@@ -91,7 +91,7 @@ public:
 };
 
 Armor Armors[] = {
-        Armor("Nigga Armor Set", 10, 20,0),
+        Armor("Iron Armor Set", 10, 20,0),
         Armor("Steel Armor Set", 15, 40,0),
         Armor("Mithril Armor Set", 20, 65,1),
         Armor("Adamant Armor Set", 25, 90,1),
