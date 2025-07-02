@@ -1,12 +1,26 @@
 #include <iostream>
 #include <string>
-#include <vector>
 #include <random>
 #include <windows.h>
-#include <stdlib.h>
+//#include <stdlib.h>
 #include <time.h>
 #include <iomanip>
+#include <fstream>
+//#include <mmsystem.h>
 using namespace std;
+
+
+void print(string text) {
+    for(char c: text) {
+        cout << c;
+        Sleep(50);
+        /*PlaySound(TEXT(
+             "C:\\Users\\theme\\OneDrive\\Desktop\\game\\Sound Effects - Single keyboard type [FREE].wav")
+             , NULL, SND_FILENAME | SND_ASYNC | SND_LOOP ); */
+        }
+    //PlaySound(0 ,0 ,0);
+}
+
 
 class Player{
 public:
@@ -51,6 +65,13 @@ public:
     }
 };
 
+Enemy Enemies[]={
+    Enemy("Dire Wolf", "Wolf", 100, 10, 5, 100,3),
+    Enemy("Goblin", "Goblin", 150, 20, 10,150,3),
+    Enemy("Skeleton", "Skeleton", 200, 30, 15,200,3),
+    Enemy("Headless Knight", "Headless Knight", 300, 50, 20,300,3),
+};
+
 class Weapon{
 public:
     string Weapon_Name;
@@ -67,12 +88,12 @@ public:
 };
 
 Weapon Weapons[] = {
-        Weapon("Dagger", 3, 20,0),
-        Weapon("Sword", 5, 25,0),
-        Weapon("Axe", 7, 30,1),
-        Weapon("Halberd", 10, 35,1),
-        Weapon("Great Sword", 15, 40,0),
-        Weapon("Great Axe", 17, 45,1),
+        Weapon("Dagger", 10, 20,1),
+        Weapon("Sword", 30, 25,0),
+        Weapon("Axe", 35, 30,1),
+        Weapon("Halberd", 45, 35,0),
+        Weapon("Great Sword", 60, 40,0),
+        Weapon("Great Axe", 70, 45,0),
 };
 
 class Armor{
@@ -91,10 +112,10 @@ public:
 };
 
 Armor Armors[] = {
-        Armor("Iron Armor Set", 10, 20,0),
+        Armor("Iron Armor Set", 10, 20,1),
         Armor("Steel Armor Set", 15, 40,0),
-        Armor("Mithril Armor Set", 20, 65,1),
-        Armor("Adamant Armor Set", 25, 90,1),
+        Armor("Mithril Armor Set", 20, 65,0),
+        Armor("Adamant Armor Set", 25, 90,0),
         Armor("Dragon Armor Set", 30, 125,0),
 };
 
@@ -114,43 +135,7 @@ public:
 };
 
 Consumable Consumables[] = {
-        Consumable("Health Potion", 50, 5,1),
-        Consumable("Mana Potion", 50, 5,0),
-};
-
-class Magic {
-public:
-    string tome_name;
-    int tome_heal;
-    int tome_price;
-    int tome_dmg;
-    int tome_num;
-
-    Magic(string name, int heal, int price, int dmg, int num) {
-        tome_name=name;
-        tome_heal=heal;
-        tome_price=price;
-        tome_num=num;
-        tome_dmg=dmg;
-    }
-
-    void use_tome(Magic tome,Player &player,Enemy &enemy){
-        player.Health+=tome_heal;
-        enemy.Health-=tome_dmg;
-    }
-};
-
-Magic tome[]={
-    Magic("Dark Magic",3,50,10,0), 
-    Magic("Healing staff",15,10,0,0),
-    Magic("Light Magic",0,25,8,0)
-};
-
-Enemy Enemies[]={
-    Enemy("Dire Wolf", "Wolf", 100, 10, 5, 100,3),
-    Enemy("Goblin", "Goblin", 150, 15, 10,150,3),
-    Enemy("Skeleton", "Skeleton", 200, 20, 15,200,3),
-    Enemy("Headless Knight", "Headless Knight", 300, 25, 20,300,3),
+        Consumable("Health Potion", 50, 5, 3),
 };
 
 string Locations[] = {
@@ -163,10 +148,10 @@ string Locations[] = {
 class Function_Manager{
 public:
     static void inv(Player &player, Weapon Weapons[],Armor Armors[], Consumable Consumables[]){
-        cout << "1.Weapons" << endl;
+        cout << "\n1.Weapons" << endl;
         cout << "2.Armor" << endl;
         cout << "3.Consumables" << endl;
-        cout << "0.Back" << endl; 
+        cout << "0.Back\n" << endl; 
 
         string choice;
         cin >> choice;
@@ -194,7 +179,7 @@ public:
 
     static void inv_weapons(Player &player, Weapon Weapons[]) {
         string Weapon_Choice;
-        
+        cout << "\n";
         for (int i = 0; i < 6; i++) {
             if (Weapons[i].Weapon_Num > 0) {
                 cout << i + 1 << ". " << Weapons[i].Weapon_Name << " | +" << Weapons[i].Weapon_Damage << " ATK | Amount Carried: " << Weapons[i].Weapon_Num << endl;
@@ -219,12 +204,12 @@ public:
 
             else if (Weapons[choice - 1].Weapon_Num > 0) {
                 player.Attack = Weapons[choice - 1].Weapon_Damage + player.STR;
-                cout << Weapons[choice - 1].Weapon_Name << " has been equipped\n";
-                cout << "this is the attack "<< player.Attack << endl;
+                cout << Weapons[choice - 1].Weapon_Name;
+                print(" has been equipped\n");
                 inv_weapons(player, Weapons);
             }
             else if (Weapons[choice - 1].Weapon_Num == 0) {
-                cout << "You don't have that weapon\n";
+                print( "You don't have that weapon\n");
                 inv_weapons(player, Weapons);
             }
         } else { 
@@ -234,7 +219,7 @@ public:
     }
 
     static void inv_Armor(Player &player, Armor armor[]) {
-
+        cout << "\n";
         string Armor_Choice;
 
         for (int i = 0; i < 5; i++) {
@@ -249,7 +234,7 @@ public:
         if (Armor_Choice.length() == 1 && isdigit(Armor_Choice[0])) {
             int choice = Armor_Choice[0] - '0';
 
-            if (choice > 5 || choice < 0) { // if choice is 6 infinite fucking defense. if choice is 7 or more it dies. cant back out when 0.
+            if (choice > 5 || choice < 0) { 
                 cout << "Invalid choice" << endl;
                 inv_Armor(player ,Armors);
             }
@@ -260,8 +245,8 @@ public:
 
             else if (Armors[choice - 1].Armor_Num > 0) {
                 player.Defense = Armors[choice - 1].Armor_Defense + player.VLR;
-                cout << Armors[choice - 1].Armor_Name << " has been equipped\n";
-                cout << "this is the defense "<< player.Defense << endl;
+                cout << Armors[choice - 1].Armor_Name;
+                print(" has been equipped\n");
                 inv_Armor(player, Armors);
             }
             else if (Armors[choice - 1].Armor_Num == 0) {
@@ -275,10 +260,10 @@ public:
     }
 
     static void inv_cons(Player &player, Consumable[]){
-
+        cout << "\n";
         string Consumable_Choice;
 
-        for (int i = 0; i<2; i++){
+        for (int i = 0; i<1; i++){
             if (Consumables[i].Consumable_Num > 0){
                 cout << i+1 << ". " << Consumables[i].Consumable_Name << " | +" << Consumables[i].Consumable_Effect << " HP | Amount Carried:" << Consumables[i].Consumable_Num << endl;
             }
@@ -289,28 +274,31 @@ public:
         if (Consumable_Choice.length() == 1 && isdigit(Consumable_Choice[0])) {
             int choice = Consumable_Choice[0] - '0';
 
-            if (choice > 2 || choice < 0) {
+            if (choice > 1 || choice < 0) {
                 cout << "Invalid choice" << endl;
                 inv_cons(player ,Consumables);
             }
-
-            if (choice == 0) {
+            
+            else if (choice == 0) {
                 inv(player, Weapons, Armors, Consumables);
             }
 
-            if (Consumables[choice - 1].Consumable_Num > 0) {
+            else if (Consumables[choice - 1].Consumable_Num > 0) {
                 if (player.Health + Consumables[choice - 1].Consumable_Effect > player.Max_Health){
                     player.Health = player.Max_Health;
                 } else {
                     player.Health += Consumables[choice - 1].Consumable_Effect;
                 }
                 Consumables[choice - 1].Consumable_Num -= 1;
-                cout << "You used " << Consumables[choice - 1].Consumable_Name << " and gained " << Consumables[choice - 1].Consumable_Effect << " HP!\n";
+                print("You used ");
+                cout<< Consumables[choice - 1].Consumable_Name;
+                print(" and gained ");
+                cout<< Consumables[choice - 1].Consumable_Effect << " HP!\n";
                 inv_cons(player, Consumables);
             }
 
-            if (Consumables[choice - 1].Consumable_Num == 0) {
-                cout << "You don't have that Consumable\n";
+            else if (Consumables[choice - 1].Consumable_Num == 0) {
+                print( "You don't have that Consumable\n");
                 inv_cons(player, Consumables);
             }
         }else { 
@@ -320,10 +308,9 @@ public:
     }
 
     static void use_consumable(Player &player, Consumable[], Enemy &enemy){
-
         string Consumable_Choice;
-
-        for (int i = 0; i<2; i++){
+        cout << "\n";
+        for (int i = 0; i<1; i++){
             if (Consumables[i].Consumable_Num > 0){
                 cout << i+1 << ". " << Consumables[i].Consumable_Name << " | +" << Consumables[i].Consumable_Effect << " HP | Amount Carried:" << Consumables[i].Consumable_Num << endl;
             }
@@ -334,7 +321,7 @@ public:
         if (Consumable_Choice.length() == 1 && isdigit(Consumable_Choice[0])) {
             int choice = Consumable_Choice[0] - '0';
 
-            if (choice > 2 || choice < 0) {
+            if (choice > 1 || choice < 0) {
                 cout << "\nInvalid choice\n\n";
                 use_consumable(player, Consumables, enemy);
             }
@@ -370,10 +357,11 @@ public:
         cout << "3. Shop\n";
         cout << "4. Stats\n";
         cout << "5. Save\n";
-        cout << "0. Quit\n";
+        cout << "6. Load\n";
+        cout << "0. Quit\n\n";
         cin >> choice;
 
-        if (choice.length() == 1 && choice[0] >= '0' && choice[0] <= '5') {
+        if (choice.length() == 1 && choice[0] >= '0' && choice[0] <= '6') {
         switch (choice[0])
         {
             case '1':
@@ -389,11 +377,15 @@ public:
                 PlayerStats(player);
                 break;
             case '5':
-                cout << "\nPlayer progress saved\n\n";
+                save(player);
+                IdleMenu(player);
+                break;
+            case '6':
+                load(player);
                 IdleMenu(player);
                 break;
             case '0':
-                cout << "\nGoodbye\n\n";
+                print("\nGoodbye\n\n");
                 exit(1);
                 break;
         }
@@ -404,15 +396,16 @@ public:
     }
 
     static void LocationIntro(Player &player){
-        cout << "You leave the safety of the town.. Where do you go?\n";
-        cout << "1. Wild Forest\n";
-        cout << "2. Dark Cave\n";
-        cout << "3. Abandoned Dungeon\n";
-        cout << "4. Haunted Castle\n";
+        cout<<"\nYou leave the safety of the town.. Where do you go?\n\n";
+        cout<<"1. Wild Forest\n";
+        cout<<"2. Dark Cave\n";
+        cout<<"3. Abandoned Dungeon\n";
+        cout<<"4. Haunted Castle\n\n";
         string Location;
         cin >> Location;
         if (Location.length() == 1 && Location[0] >= '1' && Location[0] <= '4') {
                 int choice = Location[0] - '0';
+                cout << "\n";
                 cout << "You walk into the " << Locations[choice-1] << "...\n";
                 cout << Enemies[choice-1].Enemy_Name << " Encountered!\n";
 
@@ -422,7 +415,7 @@ public:
                 FightMenu(player, enemy);
 
             } else {
-            cout << "You wander somewhere else.. You found nothing and came back..\n";
+            print("You wander somewhere else.. You found nothing and came back..\n");
             IdleMenu(player);
         }
     }
@@ -459,15 +452,14 @@ public:
         phealth = to_string(player.Health)+"/" +to_string(player.Max_Health);
         string ehealth;
         ehealth = to_string(enemy.Health)+"/" +to_string(enemy.Max_Health);
-        cout << "Name:   "<< setw(15) << setfill(' ') << left << player.Player_Name <<"|     "<<"Enemy Name:   "<<enemy.Enemy_Name<<"\n";
+        cout << "\nName:   "<< setw(15) << setfill(' ') << left << player.Player_Name <<"|     "<<"Enemy Name:   "<<enemy.Enemy_Name<<"\n";
         cout << "Health: " << setw(15) << setfill(' ') << left << phealth << "|     " << "Enemy Health: " << ehealth <<"\n";
         cout << "Level:  " << setw(15) << setfill(' ') << left << player.LVL << "|     " << "Enemy Level:  " << enemy.LVL <<"\n";
         cout << "1. Attack\n";
-        cout << "2. Defend\n";
-        cout << "3. Use Item\n";
-        cout << "4. Escape\n";
+        cout << "2. Use Item\n";
+        cout << "3. Escape\n\n";
         cin >> Fight_Choice;
-        if (Fight_Choice.length() == 1 && Fight_Choice[0] >= '1' && Fight_Choice[0] <= '4' && isdigit(Fight_Choice[0])) {
+        if (Fight_Choice.length() == 1 && Fight_Choice[0] >= '1' && Fight_Choice[0] <= '3' && isdigit(Fight_Choice[0])) {
             int choice = Fight_Choice[0] - '0';
             switch (choice)
             {
@@ -476,29 +468,41 @@ public:
                     if (enemy.Health<=0){
                         enemy.Health=0;
                     }
-                    cout << "You attack the enemy dealing " << player.Attack << " damage!\n" << "Enemy Health: " << enemy.Health << "/" << enemy.Max_Health << "\n";
+                    cout << "\n\nYou attack the enemy dealing " << player.Attack << " damage!\n" << "Enemy Health: " << enemy.Health << "/" << enemy.Max_Health << "\n";
                     if (enemy.Health <= 0){
-                        cout << "ENEMY VANQUISHED!\n";
-                        cout << enemy.Xp << " XP Gained!\n";
+                        print("\nENEMY VANQUISHED!\n\n");
+                        cout << enemy.Xp;
+                        print(" XP Gained!\n\n");
                         player.Xp += enemy.Xp;
+                        player.Cash+= enemy.LVL*5;
+                        cout << enemy.LVL*5 << "$ ";
+                        print("Cash Gained!\n");
+                        if (player.Xp >= player.Next_Xp){
+                            player.LVL++;
+                            player.Next_Xp = player.Next_Xp * 1.5;
+                            player.Max_Health += 10;
+                            player.Health = player.Max_Health;
+                            player.Attack += 1;
+                            player.Defense += 1;
+                            player.STR += 1;
+                            player.VLR += 1; 
+                            cout << "LEVEL UP!\n" << "New Level: " << player.LVL << "\n" << "Stats Increased!\n";
+                        }
                         IdleMenu(player);
                     } else {
                         EnemyReaction(player, enemy);
                     }
                     break;
                 case 2:
-                    cout << "You prepare to defend\n";
-                    break;
-                case 3:
                     use_consumable(player, Consumables, enemy);
                     break;
-                case 4:
+                case 3:
                     cout << "\nYou try to escape..\n\n";
                     if (rand()%4 == 0){
-                        cout << "You escaped!\n\n";
+                        cout << "You escaped!\n";
                         IdleMenu(player);
                     } else {
-                        cout << "You couldn't escape!\n\n";
+                        cout << "You couldn't escape!\n";
                         EnemyReaction(player,enemy);
                     }
                     break;
@@ -518,18 +522,17 @@ public:
             enemy.Heal_Effect = enemy.Max_Health * 0.20;
             enemy.Health += enemy.Heal_Effect;
             enemy.Heal_Num--;
-            cout << "Enemy used a healing item and gained " << enemy.Heal_Effect << " HP!\n";
+            cout << "\nEnemy used a healing item and gained " << enemy.Heal_Effect << " HP!\n";
             FightMenu(player, enemy);
         } else {
             int enemyAttack = enemy.Attack - player.Defense;
             if (enemyAttack <= 0) {
                 enemyAttack = 1;
             }
-            cout << "Enemy attacks you dealing " << enemyAttack << " damage!\n";
+            cout << "\nEnemy attacks you dealing " << enemyAttack << " damage!\n";
             player.Health -= enemyAttack;
             if (player.Health <= 0) {
-                cout << "YOU HAVE BEEN DEFEATED!\n";
-                // Game over logic here
+                print("\nYOU HAVE BEEN DEFEATED!\n");
             } else {
                 FightMenu(player, enemy);
             }
@@ -537,194 +540,361 @@ public:
     }
 
     static void buy(Player &player){
-        cout<<"1. View Weapons"<<endl;
-        cout<<"2. View Armor"<<endl;
-        cout<<"3. View Consumables"<<endl;
-        cout<<"4. View Magic tomes"<<endl;
+        cout<<"\t\t\t\tCash: ";
+        cout<<player.Cash<<"$"<<endl;
+        print("Merchant: Looks like I'll be making money today!\n");
+        cout <<"1. View Weapons\n";
+        cout<<"2. View Armor\n";
+        cout<<"3. View Consumables\n";
+        cout<<"0. Exit\n";
 
         string choice;
-        int player_choice;
+        string player_choice;
 
         cin >> choice;
-        if (choice.length()== 1 && choice[0] >= '1' && choice[0] <= '4'){
-            switch (choice[0]) {
-            case '1':
-                for(int i=0;i<5;i++) 
-                {
-                    cout<<i+1<<". "<<Weapons[i].Weapon_Name<<endl;
-                }
-                cout<<"6. Exit"<<endl;
-                cin>>player_choice;
+        int choice_num=(int)choice[0]-48;
 
-                if(player_choice==6) 
-                {
+        if(choice.length()==1 && choice_num<=3 && choice_num>=0 ){
+            switch (choice_num) {
+                case 1:
+                    cout<<"\t\t\t\tCash: ";
+                cout <<player.Cash<<"$"<<endl;
+
+                    for(int i=0;i<6;i++)
+                    {
+                        cout<<i+1<<". "<<Weapons[i].Weapon_Name<<"\t|ATK: "<<Weapons[i].Weapon_Damage<<"\t| Price: "<<Weapons[i].Weapon_Price<<endl;
+                    }
+                    cout<<"0. Exit\n"<<endl;
+                    cin>>player_choice;
+                    if(player_choice.length()==1 && player_choice[0]<='6' && player_choice[0]>='0'){
+                        int Index= (int)player_choice[0]-48;
+                        if(Index==0)
+                            IdleMenu(player);
+
+                        else{
+                            Index--;
+
+                            if(player.Cash<Weapons[Index].Weapon_Price){
+                                print("Merchant: you do not have enough money sorry\n");
+                                merchant(player);
+                            }
+                            else {Weapons[Index].Weapon_Num+=1;
+                                cout<<"Weapon price: "<<Weapons[Index].Weapon_Price<< "\nCash: "<<player.Cash<<"\nReceipt: "<<player.Cash<< " - "<<Weapons[Index].Weapon_Price<<" = "<<player.Cash-Weapons[Index].Weapon_Price<<endl;
+
+                                player.Cash-=Weapons[Index].Weapon_Price;
+                                cout<<"You bought "<<Weapons[Index].Weapon_Name<<" !"<<endl;
+                                print("Merchant: Enjoy your new weapon, it once belonged to a great warrior..\n");
+                                cout<<"\t\t\t\tRemaining Cash: "<<player.Cash<<"$"<<endl;
+
+                                IdleMenu(player);}
+
+                        }}
+                    else{
+                        print("Merchant: Not sure if I got that right.\n");
+                        buy(player);
+                    }
+
+                    break;
+
+                case 2:
+                    print("\t\t\t\tCash: ");
+                cout<<player.Cash<<"$"<<endl;
+
+                    for(int i=0;i<5;i++)
+                        cout<<i+1<<". "<<Armors[i].Armor_Name<<"\t|DEF: "<<Armors[i].Armor_Defense<<"\t| Price: "<<Armors[i].Armor_Price<<endl;
+
+                    cout<<"6. Exit\n"<<endl;
+                    cin>>player_choice;
+                    if(player_choice.length()==1 && player_choice[0]>='0' && player_choice[0]<='5' ){
+                        int Index=(int)player_choice[0]-48;
+                        if(Index==0)
+                            IdleMenu(player);
+
+                        else {
+
+                            Index--;
+                            if(player.Cash<Armors[Index].Armor_Price){
+                                print("Merchant: you do not have enough money sorry\n");
+                                merchant(player);
+                            }
+                            else {Armors[Index].Armor_Num+=1;
+                                cout<<"Armor price: "<<Armors[Index].Armor_Price<< "\nCash: "<<player.Cash<<"\nReceipt: "<<player.Cash<< " - "<<Armors[Index].Armor_Price<<" = "<<player.Cash-Armors[Index].Armor_Price<<endl;
+
+                                player.Cash-=Armors[Index].Armor_Price;
+                                cout<<"New Armour "<<Armors[Index].Armor_Name<<" Acquired!\n";
+                                print("Merchant: Come by again! You are my only source of income..\n");
+                                cout<<"\t\t\t\t Remaining Cash: "<<player.Cash<<"$"<<endl;
+
+                                IdleMenu(player);}
+
+                        }}
+                    else{
+                        print("Merchant: Huh? I didn't quite catch that.\n");
+                        buy(player);
+
+                    }
+                    break;
+
+                case 3:
+                    cout<<"\t\t\t\tCash: "<<player.Cash<<"$"<<endl;
+
+                    for(int i=0;i<1;i++)
+                        cout<<i+1<<". "<<Consumables[i].Consumable_Name<<"\t|EFFECT: "<<Consumables[i].Consumable_Effect<<"\t| Price: "<<Consumables[i].Consumable_Price<<endl;
+
+                    cout<<"0. Exit\n"<<endl;
+                    cin>>player_choice;
+                    if(player_choice.length()==1 && player_choice[0]>='0' && player_choice[0]<='2' ){
+                        int Index=(int)player_choice[0]-48;
+                        if(Index==0)
+                            IdleMenu(player);
+
+
+                        else{
+                            Index--;
+
+                            if(player.Cash<Consumables[Index].Consumable_Price){
+                                print("Merchant: this is no charity work..get out of my shop\n");
+                                merchant(player);
+                            }
+                            else {Consumables[Index].Consumable_Num+=1;
+                                cout<<"Consumable price: "<<Consumables[Index].Consumable_Price<< "\nCash: "<<player.Cash<<"\nReceipt: "<<player.Cash<< " - "<<Consumables[Index].Consumable_Price<<" = "<<player.Cash-Consumables[Index].Consumable_Price<<endl;
+                            player.Cash-=Consumables[Index].Consumable_Price;
+                            cout<<Consumables[Index].Consumable_Name;
+                                print(" has been added to your inventory !\n");
+                            print("Merchant: I was worried no one would buy this..\n");
+                            cout<<"\t\t\t\tRemaining Cash: "<<player.Cash<<"$"<<endl;
+
+                            IdleMenu(player);}
+                        }}
+                    else{
+                        print("Merchant: Errmm...What?\n");
+                        buy(player);
+
+                    }
+                    break;
+                case 0:
+                    print("Merchant: See you later!\n");
                     IdleMenu(player);
-                }
-
-                else{ 
-                Weapons[player_choice].Weapon_Num+=1;
-                cout<<"You bought shit"<<endl;
-                }
-            break;
-
-            case '2':
-                for(int i=0;i<5;i++) 
-                {
-                    cout<<i+1<<". "<<Armors[i].Armor_Name<<endl;
-                }
-                cout<<"6. Exit"<<endl;
-                cin>>player_choice;
-                if(player_choice==6) 
-                {
-                    IdleMenu(player);
-                }
-                else
-                Armors[player_choice].Armor_Num+=1;
-            break;
-
-            case '3':
-                for(int i=0;i<3;i++) {
-                    cout<<i+1<<". "<<Consumables[i].Consumable_Name<<endl;
-                }
-                cout<<"6. Exit"<<endl;
-                cin>>player_choice;
-
-                if(player_choice==6) 
-                {
-                    IdleMenu(player);
-                }
-                else
-                Consumables[player_choice].Consumable_Num+=1;
-            break;
-
-            case '4':
-                for(int i=0;i<4;i++) 
-                {
-                    cout<<i+1<<". "<<tome[i].tome_name<<endl;
-                }        
-                cout<<"6. Exit"<<endl;
-                cin>>player_choice;
-                if(player_choice==6) {
-                    IdleMenu(player);
-                }
-                else
-                tome[player_choice].tome_num+=1;
-            break;
-
-            default:
-                cout<<"Invalid choice";
-                buy(player);
+            }
         }
-        }
+        else{
+            cout<<"Invalid choice.\n";
+            buy(player);}
+
     }
 
     static void sell_items(Player &player) {
-        cout<<"Show me what you've got!!"<<endl;
+        print("\nMerchant: Show me what you've got!!\n");
+        cout<<"\t\t\t\tCash: "<<player.Cash<<"$"<<endl;
         cout<<"1. Show Weapons"<<endl;
         cout<<"2. Show Armor"<<endl;
         cout<<"3. Show Consumables"<<endl;
-        cout<<"4. Show Magic tomes"<<endl;
+        cout<<"0. Exit"<<endl;
 
         string choice;
-        int player_choice;
+        string player_choice;
         cin >> choice;
-        
-        if (choice.length()== 1 && choice[0] >= '1' && choice[0] <= '4') {
+        int choice_num=(int)choice[0]-48;
 
-            switch (choice[0]) {
-            case '1':
-                for(int i=0;i<5;i++) {
-                    if (Weapons[i].Weapon_Num>0)
-                    cout<<i+1<<". "<<Weapons[i].Weapon_Name<<endl;
-                }
-            cout<<"6. Exit";
+        if(choice.length()==1 && choice[0]<='3' && choice[0]>='0'){
+            switch (choice_num) {
+                case 1:
+                    cout<<"\t\t\t\tCash: "<<player.Cash<<"$"<<endl;
 
-            cin>>player_choice;
+                    for(int i=0;i<6;i++) {
+                        if(Weapons[i].Weapon_Num>0)
+                            cout<<i+1<<". "<<Weapons[i].Weapon_Name<<"\t|ATK: "<<Weapons[i].Weapon_Damage<<"\t| Price: "<<Weapons[i].Weapon_Price<<endl;
+                    }
+                    cout<<"0. Exit\n";
+                    cin>>player_choice;
+                    if(player_choice.length()==1 && player_choice[0]<='6' && player_choice[0]>='0'){
+                        int Index= (int)player_choice[0]-48;
+                        if(Index==0)
+                            IdleMenu(player);
 
-            /*if(player_choice==6) {
-                IdleMenu(player);
-            }
-            else */Weapons[player_choice].Weapon_Num-=1;
-            player.Cash+=Weapons[player_choice].Weapon_Price;
+                        else {
+                            Index--;
+                            if(Weapons[Index].Weapon_Num==0){
+                                cout<<"WHO DO YOU MISTAKE ME FOR??? IM THE ONE WHO CREATED SCAMMING!!\n";
+                                sell_items(player);
+                            }
+                            else{
+                                Weapons[Index].Weapon_Num-=1;
+                                player.Cash+=Weapons[Index].Weapon_Price;}
+                                cout<<"You have sold "<<Weapons[Index].Weapon_Name<<" and gained: "<<Weapons[Index].Weapon_Price<<" Coins!\n";
+                                cout<<"\t\t\t\tCash Carried: "<<player.Cash<<"$"<<endl;
 
-            break;
+                                print("Merchant: Come back again!! ...What an idiot he doesn't know how much this weapon is worth\n");
+                                IdleMenu(player);
 
-            case '2':
-                for(int i=0;i<5;i++) {
-                    if(Armors[i].Armor_Num>0)
+                            }
+                        }
 
-                    cout<<i+1<<". "<<Armors[i].Armor_Name<<endl;
-                }
-            cout<<"6. Exit";
 
-            cin>>player_choice;
-            /*if(player_choice==6) {
-                IdleMenu(player);
-            }
-            else*/
-                Armors[player_choice].Armor_Num-=1;
-            player.Cash+=Armors[player_choice].Armor_Price;
 
-            break;
+                    else{
+                        print("Merchant: Does this option even exist?\n");
+                        sell_items(player);}
+                    break;
 
-            case '3':
-                for(int i=0;i<3;i++) {
-                    if(Consumables[i].Consumable_Num>0)
+                case 2:
+                    cout<<"\t\t\t\tCash: "<<player.Cash<<"$"<<endl;
 
-                    cout<<i+1<<". "<<Consumables[i].Consumable_Name<<endl;
-                }
-            cout<<"6. Exit";
+                    for(int i=0;i<5;i++) {
+                        if(Armors[i].Armor_Num>0)
+                            cout<<i+1<<". "<<Armors[i].Armor_Name<<"\t|DEF: "<<Armors[i].Armor_Defense<<"\t| Price: "<<Armors[i].Armor_Price<<endl;
+                    }
+                    cout<<"0. Exit\n";
+                    cin>>player_choice;
+                    if(player_choice.length()==1 && player_choice[0]>='0' && player_choice[0]<='5' ){
+                        int Index=(int)player_choice[0]-48;
+                        if(Index==0)
+                            IdleMenu(player);
 
-            cin>>player_choice;
-            /*if(player_choice==6) {
-                IdleMenu(player);
-            }
-            else*/
-                Consumables[player_choice].Consumable_Num-=1;
-            player.Cash+=Consumables[player_choice].Consumable_Price;
-            break;
+                        else {
+                            Index--;
+                            if (Armors[Index].Armor_Num == 0) {
+                                print("Merchant: scamming ME?? how foolish of you ..that's MY thing!\n");
+                                sell_items(player);
+                            } else {
+                                Armors[Index].Armor_Num -= 1;
+                                player.Cash += Armors[Index].Armor_Price;
 
-            case '4':
-                for(int i=0;i<4;i++) {
-                    if(tome[i].tome_num>0)
+                                print("You have sold ");
+                                cout<< Armors[Index].Armor_Name;
+                                print(" and gained: ");
+                                cout<< Armors[Index].Armor_Price << " Coins!\n";
+                                cout<<"\t\t\t\tCash Carried: "<<player.Cash<<"$"<<endl;
 
-                    cout<<i+1<<". "<<tome[i].tome_name<<endl;
-                }        cout<<"6. Exit";
+                                print("Merchant: Come back again!! ...What an idiot he doesn't know how much this weapon is worth\n");
+                                IdleMenu(player);
+                            }
+                        }}
 
-            cin>>player_choice;
-            /*if(player_choice==6) {
-                IdleMenu(player);
-            }
-            else*/
-                tome[player_choice].tome_num-=1;
-            player.Cash+=tome[player_choice].tome_price;
-            break;
+                    else {
+                        print("Merchant: Try again.\n");
+                        sell_items(player);}
+                    break;
 
-            default:
-                cout<<"Invalid choice";
-                sell_items(player);
-            break;
-        }
+                case 3:
+                    cout<<"\t\t\t\tCash: "<<player.Cash<<"$"<<endl;
+
+                    for(int i=0;i<1;i++) {
+                        if(Consumables[i].Consumable_Num>0)
+                            cout<<i+1<<". "<<Consumables[i].Consumable_Name<<"\t|EFFECT: "<<Consumables[i].Consumable_Effect<<"\t| Price: "<<Consumables[i].Consumable_Price<<endl;
+                    }
+                    cout<<"0. Exit\n";
+
+                    cin>>player_choice;
+                    if(player_choice.length()==1 && player_choice[0]>='0' && player_choice[0]<='1'){
+                        int Index=(int)player_choice[0]-48;
+                        if(Index==0)
+                            IdleMenu(player);
+
+                        else {
+                            Index--;
+                            if (Consumables[Index].Consumable_Num == 0) {
+                                print( "Merchant: You cant fool me by selling me something that doesnt exist..\n");
+                                sell_items(player);
+                            } else {
+                                Consumables[Index].Consumable_Num -= 1;
+                                player.Cash += Consumables[Index].Consumable_Price;
+
+                                cout << "You have sold " << Consumables[Index].Consumable_Name << " and gained: "
+                                     << Consumables[Index].Consumable_Price << " Coins!\n";
+                                cout<<"\t\t\t\tCash Carried: "<<player.Cash<<"$"<<endl;
+
+                                print( "Merchant: Come back again!! ...What an idiot he doesn't know how much this weapon is worth\n");
+                                IdleMenu(player);
+                            }
+                        }}
+                    else {
+                        print("Merchant: I don't think that's an option...\n");
+                        sell_items(player);
+                    }
+                    break;
+
+
+
+                case 0:
+                    print("Merchant: See ya again!\n");
+                    IdleMenu(player);
+            }}
+        else {
+            cout<<"Invalid choice\n";
+            sell_items(player);
         }
     }
 
     static void merchant(Player &player) {
         string b_s;
-        cout<<"Welcome to my humble shop, how can I be of help?"<<endl;
-        cout<<"1. Buy"<<endl<<"2. Sell items"<<endl;
+        print("\nMerchant: Welcome to my humble shop, how can I be of help?\n");
+        cout<<"1. Buy"<<endl<<"2. Sell items"<<endl<<"0. Exit\n";
         cin>>b_s;
-        if (b_s.length()==1 && b_s[0] >= '1' && b_s[0] <= '2'){
-            switch (b_s[0]) {
-                case '1':
+        if(b_s.length()==1 && b_s[0]>='0' && b_s[0]<='2'){
+            int b_s_num= (int)b_s[0]-48;
+            switch (b_s_num) {
+                case 1:
                     buy(player);
                     break;
-
-                case '2':
+                case 2:
                     sell_items(player);
                     break;
-            }
+                case 0:
+                    IdleMenu(player);
+                    break;}}
+        else{
+            cout<<"Invalid choice\n";
+            merchant((player));
         }
     }
+
+    static void load(Player &player) {
+        ifstream inFile("savegame.txt");
+        if (inFile.is_open()) {
+            getline(inFile, player.Player_Name);
+            getline(inFile, player.Player_Race);
+            getline(inFile, player.Player_Sex);
+            inFile >> player.Cash;
+            inFile >> player.Xp;
+            inFile >> player.Next_Xp;
+            inFile >> player.Health;
+            inFile >> player.Max_Health;
+            inFile >> player.Attack;
+            inFile >> player.Defense;
+            inFile >> player.LVL;
+            inFile >> player.STR;
+            inFile >> player.VLR;
+            inFile.close();
+            print("\nPlayer progress loaded!\n\n");
+        } else {
+            print("\nNo save file found\n\n");
+        }
+    }
+
+    static void save(Player &player) {
+        ofstream outFile("savegame.txt");
+        if (outFile.is_open()) {
+            outFile << player.Player_Name << endl;
+            outFile << player.Player_Race << endl;
+            outFile << player.Player_Sex << endl;
+            outFile << player.Cash << endl;
+            outFile << player.Xp << endl;
+            outFile << player.Next_Xp << endl;
+            outFile << player.Health << endl;
+            outFile << player.Max_Health << endl;
+            outFile << player.Attack << endl;
+            outFile << player.Defense << endl;
+            outFile << player.LVL << endl;
+            outFile << player.STR << endl;
+            outFile << player.VLR << endl;
+            outFile.close();
+            print("\nPlayer progress saved!\n\n");
+        } else {
+            print ("\nFailed to open save file\n\n");
+        }
+    }
+
 };
 
 int main(){
@@ -734,26 +904,19 @@ int main(){
 
     srand(static_cast<unsigned>(time(nullptr)));
 
-    Sleep(300);
-    cout << "Please enter your player's name..\n";
-    cin >> Player_Name;
-    Sleep(300);
-    cout << "Please enter your player's race..\n";
-    cin >> Player_Race;
-    Sleep(300);
-    cout << "Please enter your player's sex..\n";
-    cin >> Player_Sex;
-    Sleep(300);
-    cout << "\nYou Rise from the ashes, a new hero is born..\n\n";
-    Sleep(300);
-    cout << "You wander into a nearby town, it seems safe and lively..\n";
+    print("Please enter your player's name..\n");
+    getline(cin, Player_Name);
+    print("Please enter your player's race..\n");
+    getline(cin, Player_Race);
+    print("Please enter your player's sex..\n");
+    getline(cin, Player_Sex);
+    print("\nYou Rise from the ashes, a new hero is born..\n\n");
+     print("You come across a rusty dagger and a tattered iron armor..\n\n");
+    print("You wander into a nearby town, it seems safe and lively..\n");
 
 
     Player player(Player_Name, Player_Race, Player_Sex,75,1,1,100,1,1,1,1,75,2);
     Function_Manager::IdleMenu(player);
 
-
-
     return 0;
 }
-
